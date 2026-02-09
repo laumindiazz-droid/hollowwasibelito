@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Hollowwasibelo - Inicio</title>
+    <style>
+        /* Estilos visuales originales */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; }
+        
+        #pantalla-inicio {
+            width: 100vw; height: 100vh;
+            background: url('fondo.png') no-repeat center center fixed; 
+            background-size: cover;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative;
+        }
+
+        .boton-jugar {
+            padding: 15px 50px;
+            font-size: 2rem;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #5ecad9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            user-select: none; /* Evita que se seleccione el texto al dar doble clic */
+        }
+
+        .boton-jugar:hover {
+            background: #5ecad9;
+            color: black;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #5ecad9;
+        }
+
+        .boton-jugar:active { transform: scale(0.9); }
+
+        .hoja {
+            position: absolute;
+            top: -50px;
+            width: 15px; height: 15px;
+            background: #2d5a27;
+            border-radius: 0 100% 0 100%;
+            opacity: 0.7;
+            animation: caer linear infinite;
+        }
+
+        @keyframes caer {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* --- PARTE 2: ESTILOS DE LA CARGA ROMÁNTICA --- */
+        #pantalla-carga-amor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: black;
+            z-index: 100;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+
+        .corazon-clic {
+            width: 70px;
+            margin: 10px;
+            cursor: pointer;
+            filter: grayscale(100%) brightness(0.5);
+            transition: all 0.5s ease;
+        }
+
+        .corazon-clic.activo {
+            filter: grayscale(0%) brightness(1.2);
+            transform: scale(1.2);
+        }
+
+        .petal {
+            position: absolute;
+            background-color: #ffb7c5; 
+            border-radius: 150% 0 150% 0;
+            opacity: 0.8;
+            pointer-events: none; 
+            animation: fall linear infinite, sway ease-in-out infinite;
+            z-index: 101;
+        }
+
+        @keyframes fall {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(50px) rotate(45deg); }
+        }
+
+        #boton-listo-juego {
+            margin-top: 30px;
+            background: white; color: black; border: none;
+            padding: 15px 40px; font-family: 'Georgia', serif;
+            letter-spacing: 5px; cursor: pointer;
+            box-shadow: 0 0 20px white; transition: 0.3s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="pantalla-inicio">
+        <audio id="musica" loop>
+            <source src="musica.mp3" type="audio/mpeg">
+        </audio>
+        
+        <audio id="muzika-romantica" loop>
+            <source src="muzika.mp3" type="audio/mpeg">
+        </audio>
+
+        <button class="boton-jugar" ondblclick="iniciarJuego()">Jugar</button>
+    </div>
+
+    <div id="pantalla-carga-amor" style="display: none;">
+        <div id="contenedor-petalos"></div>
+        
+        <div class="interfaz-carga" style="position: relative; z-index: 20; text-align: center;">
+            <img id="imagen-fondo-carga" src="fondo corazón.png" alt="Fondo" style="position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; object-fit: cover;">
+            
+            <div id="grupo-corazones">
+                <img class="corazon-clic" id="corazon1" src="corazones.png">
+                <img class="corazon-clic" id="corazon2" src="corazones.png">
+                <img class="corazon-clic" id="corazon3" src="corazones.png">
+                <img class="corazon-clic" id="corazon4" src="corazones.png">
+                <img class="corazon-clic" id="corazon5" src="corazones.png">
+            </div>
+
+            <p id="frase-amor-knight" style="color: white; font-size: 1.5rem; text-align: center; margin-top: 20px; font-weight: bold; min-height: 2em;"></p>
+            
+            <button id="boton-listo-juego" style="display: none;">¿LISTO?</button>
+        </div>
+    </div>
+
+    <script>
+        // --- INICIO: HOJAS VERDES ---
+        function crearHoja() {
+            const pantallaInicio = document.getElementById('pantalla-inicio');
+            if (pantallaInicio.style.display === 'none') return;
+
+            const hoja = document.createElement('div');
+            hoja.classList.add('hoja');
+            hoja.style.left = Math.random() * 100 + "vw";
+            hoja.style.animationDuration = (Math.random() * 3 + 2) + "s";
+            pantallaInicio.appendChild(hoja);
+            
+            setTimeout(() => { hoja.remove(); }, 5000);
+        }
+        setInterval(crearHoja, 300);
+
+        // --- PARTE 3: LÓGICA DE CARGA Y CORAZONES ---
+        let clicsDados = 0;
+        const frasesHollow = [
+            "Un vínculo que trasciende el tiempo y el Reino.",
+            "Dos almas unidas por un destino que ni el Vacío puede separar.",
+            "Como un Amuleto precioso, me otorgas la fuerza para seguir.",
+            "Nuestro encuentro fue el mapa que guió mi corazón al tuyo.",
+            "Eres mi luz en el sendero más oscuro de Hallownest."
+        ];
+
+        function iniciarJuego() {
+            // 1. Cambiar la música
+            document.getElementById('musica').pause();
+            const nuevaMusica = document.getElementById('muzika-romantica');
+            nuevaMusica.play();
+
+            // 2. Transición de pantallas
+            document.getElementById('pantalla-inicio').style.display = 'none';
+            document.getElementById('pantalla-carga-amor').style.display = 'flex';
+
+            // 3. Empezar a crear pétalos rosas
+            setInterval(crearPetalo, 500);
+        }
+
+        function crearPetalo() {
+            const contenedor = document.getElementById('contenedor-petalos');
+            const petalo = document.createElement('div');
+            petalo.classList.add('petal');
+            
+            petalo.style.left = Math.random() * 100 + "vw";
+            petalo.style.width = Math.random() * 10 + 10 + "px";
+            petalo.style.height = petalo.style.width;
+            petalo.style.animationDuration = (Math.random() * 3 + 4) + "s";
+            
+            contenedor.appendChild(petalo);
+            setTimeout(() => { petalo.remove(); }, 7000);
+        }
+
+        // Configurar clics en los corazones
+        document.querySelectorAll('.corazon-clic').forEach((corazon, index) => {
+            corazon.addEventListener('click', function() {
+                if (index === clicsDados) {
+                    this.classList.add('activo');
+                    document.getElementById('frase-amor-knight').innerText = frasesHollow[clicsDados];
+                    clicsDados++;
+
+                    if (clicsDados === 5) {
+                        setTimeout(() => {
+                            document.getElementById('boton-listo-juego').style.display = 'inline-block';
+                        }, 800);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
